@@ -23,10 +23,17 @@ spring:
           timeout: 3000ms
 server:
   port: ${SERVER_PORT}
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info  # Cho Render health check
+#rsa:
+#  public-key: classpath:keys/public.pem
+#  private-key: classpath:keys/private.pem
 rsa:
-  public-key: classpath:keys/public.pem
-  private-key: classpath:keys/private.pem
+  public-key: ${RSA_PUBLIC_KEY}
+  private-key: ${RSA_PRIVATE_KEY}
 
 refresh-token:
   key: ${REFRESH_TOKEN_KEY_PREFIX}
