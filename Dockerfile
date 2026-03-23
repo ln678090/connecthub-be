@@ -5,8 +5,6 @@ COPY . .
 RUN chmod +x ./gradlew
 
 # Build project (bỏ qua test để build nhanh hơn)
-# RUN ./gradlew build -x test
-# Bỏ qua test + bỏ luôn SpotBugs khi build trong Docker
 RUN ./gradlew build -x test -x spotbugsMain -x spotbugsTest
 
 FROM eclipse-temurin:25-jre-alpine
