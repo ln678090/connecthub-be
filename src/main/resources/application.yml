@@ -1,3 +1,5 @@
+server:
+  port: ${PORT}
 spring:
   application:
     name: ConnectHub
@@ -24,8 +26,8 @@ spring:
   threads:
     virtual:
       enabled: true
-server:
-  port: ${SERVER_PORT}
+  jmx:
+    enabled: false
 management:
   endpoints:
     web:
