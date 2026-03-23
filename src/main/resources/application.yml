@@ -21,6 +21,9 @@ spring:
           host: ${REDIS_HOST}
           port: ${REDIS_PORT}
           timeout: 3000ms
+  threads:
+    virtual:
+      enabled: true          
 server:
   port: ${SERVER_PORT:10000}
 management:
