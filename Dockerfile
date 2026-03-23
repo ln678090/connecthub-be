@@ -12,5 +12,5 @@ WORKDIR /app
 # Copy file jar từ stage builder
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-EXPOSE 8809
+EXPOSE 10000
 ENTRYPOINT ["java", "-jar", "app.jar"]
