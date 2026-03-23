@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 
-@Configuration
-@EnableCaching
+//@Configuration
+//@EnableCaching
 public class RateLimitConfig {
 
     public static final String CACHE_NAME = "rate-limit-buckets";

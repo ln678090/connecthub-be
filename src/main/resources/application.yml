@@ -15,13 +15,14 @@ spring:
       leak-detection-threshold: 60000
   data:
     redis:
-          url: ${REDIS_URL}
+#          url: ${REDIS_URL}
           username: ${REDIS_USERNAME}
           password: ${REDIS_PASSWORD}
           host: ${REDIS_HOST}
           port: ${REDIS_PORT}
+          timeout: 3000ms
 server:
-  port: 8809
+  port: ${SERVER_PORT}
 
 rsa:
   public-key: classpath:keys/public.pem
