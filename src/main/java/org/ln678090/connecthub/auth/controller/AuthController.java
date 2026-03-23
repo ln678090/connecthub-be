@@ -90,7 +90,7 @@ public class AuthController {
                     .secure(false)
                     .path("/api/auth")
                     .maxAge(0)
-                    .sameSite("Strict")
+                    .sameSite("None")
                     .build();
         } else {
             deleteCookie = null;
@@ -127,7 +127,7 @@ public class AuthController {
                 .secure(true) // production nên để true khi dùng HTTPS
                 .path("/api/auth")
                 .maxAge(REFRESH_TOKEN_MAX_AGE)
-                .sameSite("Strict")
+                .sameSite("None")
                 .build();
 
         AuthResponse authResponse = new AuthResponse(
