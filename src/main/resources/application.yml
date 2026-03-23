@@ -22,7 +22,7 @@ spring:
           port: ${REDIS_PORT}
           timeout: 3000ms
 server:
-  port: ${SERVER_PORT}
+  port: ${SERVER_PORT:10000}
 management:
   endpoints:
     web:
