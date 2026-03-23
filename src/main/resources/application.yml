@@ -43,7 +43,7 @@ rsa:
 refresh-token:
   key: ${REFRESH_TOKEN_KEY_PREFIX}
 bucket4j:
-  enabled: true
+  enabled: false
   default-http-status-code: TOO_MANY_REQUESTS # HTTP 429
   default-http-content-type: application/json;charset=UTF-8
   # Bọc chuỗi JSON bằng dấu nháy đơn để tránh lỗi Parser của Spring YML
