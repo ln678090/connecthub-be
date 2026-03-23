@@ -1,0 +1,49 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+!**/src/main/resources/db/
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+### Security & Secrets ###
+# Bỏ qua toàn bộ thư mục chứa public.pem và private.pem
+src/main/resources/keys/
+# Bỏ qua file .env (nếu bạn có dùng để cấu hình biến môi trường cục bộ)
+.env
+.env.local
+.env.development
+.env.*
+
+# Bỏ qua file nhật ký (logs) có thể chứa thông tin người dùng
+*.log
+logs/

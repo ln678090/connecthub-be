@@ -1,0 +1,71 @@
+import com.github.spotbugs.snom.SpotBugsTask
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.11'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.github.spotbugs' version '6.4.8'
+}
+
+group = 'org.ln678090'
+version = '0.0.1-SNAPSHOT'
+description = 'ConnectHub'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springframework.security:spring-security-test'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation "com.github.f4b6a3:uuid-creator:6.0.0"
+    implementation("org.bouncycastle:bcprov-jdk18on:1.83")
+//    runtimeOnly 'org.springframework.boot:spring-boot-docker-compose'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation("org.owasp:dependency-check-maven:12.2.0")
+
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.14.0'
+// Thư viện cốt lõi để Rate Limit bằng file yml
+    implementation 'com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.12.7'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    // Redisson và JCache API để đồng bộ hóa bộ đếm trên Redis
+    implementation 'org.redisson:redisson-spring-boot-starter:3.27.2'
+    implementation 'javax.cache:cache-api:1.1.1'
+}
+spotbugs {
+    toolVersion = '4.9.8'
+    ignoreFailures = false
+}
+tasks.withType(SpotBugsTask).configureEach {
+    reports {
+        html.required = true
+        xml.required = false
+    }
+}
+tasks.named('test') {
+    useJUnitPlatform()
+}
