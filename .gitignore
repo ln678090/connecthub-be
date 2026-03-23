@@ -38,6 +38,7 @@ out/
 ### Security & Secrets ###
 # Bỏ qua toàn bộ thư mục chứa public.pem và private.pem
 src/main/resources/keys/
+src/main/resources/db/private/
 # Bỏ qua file .env (nếu bạn có dùng để cấu hình biến môi trường cục bộ)
 .env
 .env.local
