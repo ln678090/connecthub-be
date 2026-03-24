@@ -3,6 +3,7 @@ package org.ln678090.connecthub.auth.config.security;
 import lombok.RequiredArgsConstructor;
 import org.ln678090.connecthub.auth.config.custom.CustomUserDetails;
 import org.ln678090.connecthub.auth.config.keys.RsaKeyProperties;
+import org.ln678090.connecthub.auth.config.ratelimit.RateLimitingFilter;
 import org.ln678090.connecthub.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,6 +35,7 @@ import java.util.List;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final RateLimitingFilter rateLimitingFilter;
     private final RsaKeyProperties rsaKeys;
     @Value("${app.cors.allowed-origins}")
     private List<String> allowedOrigins;
@@ -41,6 +44,7 @@ public class SecurityConfig {
         return  http.
                 csrf(AbstractHttpConfigurer::disable)
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/test").permitAll()

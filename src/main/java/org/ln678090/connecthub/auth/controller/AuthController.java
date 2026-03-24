@@ -109,10 +109,15 @@ public class AuthController {
 
     @GetMapping("/test")
     public ResponseEntity<ApiResp<String>> test() {
+
+        String threadName = Thread.currentThread().getName();
+
+        // Log ra console để bạn quan sát trực tiếp trên Render Log
+        System.out.println("===> Request đang được xử lý bởi Thread: " + threadName);
+
         return ResponseEntity.ok(ApiResp.<String>builder()
-                .message("Test thành công")
-                .data("OK")
                 .timestamp(Instant.now().toString())
+                .data("Current Thread: " + threadName)
                 .build());
     }
 

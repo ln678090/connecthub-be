@@ -30,6 +30,8 @@ spring:
       enabled: true
   jmx:
     enabled: false
+  jpa:
+    open-in-view: false
 management:
   endpoints:
     web:
