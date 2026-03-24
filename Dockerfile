@@ -21,4 +21,5 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 # Ép hệ thống dùng IPv4 và ép cứng cổng 10000 ra mọi IP
 EXPOSE 10000
-ENTRYPOINT ["java", "-Djava.net.preferIPv4Stack=true", "-Dserver.port=10000", "-Dserver.address=0.0.0.0", "-jar", "app.jar"]
+# THÊM CỜ KÍCH HOẠT PROFILE PROD Ở ĐÂY
+ENTRYPOINT ["java", "-Djava.net.preferIPv4Stack=true", "-Dspring.profiles.active=prod", "-Dserver.port=10000", "-Dserver.address=0.0.0.0", "-jar", "app.jar"]
