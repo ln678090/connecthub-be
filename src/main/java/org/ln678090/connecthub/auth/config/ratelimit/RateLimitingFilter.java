@@ -94,8 +94,8 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             };
 
             response.getWriter().write("{\"status\": 429, \"message\": \"" + message + "\"}");
-            log.warn("[RateLimit][{}] Blocked IP: {} | Count: {}/{} | URI: {}",
-                    tier, clientIp, requestCount, maxRequests, uri);
+//            log.warn("[RateLimit][{}] Blocked IP: {} | Count: {}/{} | URI: {}",
+//                    tier, clientIp, requestCount, maxRequests, uri);
             return;
         }
 

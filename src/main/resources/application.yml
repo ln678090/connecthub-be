@@ -33,3 +33,14 @@ bucket4j:
             - capacity: 10
               time: 1
               unit: minutes
+server:
+  port: ${PORT:10000}
+  address: 0.0.0.0
+  tomcat:
+    # 1. Chỉ cho phép tối đa 200 request được xử lý cùng lúc (mặc định 8192 rất dễ sập RAM)
+    max-connections: 200
+    # 2. Số thread tối đa được tạo ra (giữ ở mức 50 để đỡ tốn CPU của Render)
+    threads:
+      max: 50
+    # 3. Khi server bận, cho tối đa 100 request đứng xếp hàng (sau đó drop ngay lập tức)
+    accept-count: 100
