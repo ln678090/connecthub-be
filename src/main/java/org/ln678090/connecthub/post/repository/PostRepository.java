@@ -12,9 +12,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {
+    @EntityGraph(attributePaths = {"user"})
+    Optional<Post> findById(UUID id);
 
     @EntityGraph(attributePaths = {"user"})
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
@@ -42,4 +45,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     @EntityGraph(attributePaths = {"user"}) // Lấy kèm User để tránh N+1
     Window<Post> findAllByOrderByCreatedAtDescIdDesc(ScrollPosition position, Limit limit);
+    @EntityGraph(attributePaths = {"user"})
+    Window<Post> findByUserIdOrderByCreatedAtDescIdDesc(UUID userId, ScrollPosition position, Limit limit);
+
 }

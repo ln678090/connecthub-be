@@ -19,5 +19,6 @@ public interface PostService {
     void softDeletePost(UUID postId, UUID currentUserId) throws AccessDeniedException;
     // Thay đổi kiểu dữ liệu tham số truyền vào
     Map<String, Object> getFeedCursor(UUID currentUserId, ScrollPosition scrollPosition, int size);
-
+    Map<String, Object> getPostsByUserIdCursor(UUID targetUserId, UUID currentUserId, ScrollPosition scrollPosition, int size);
+    PostResponse getPostById(UUID postId, UUID currentUserId);
 }

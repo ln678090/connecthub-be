@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.ln678090.connecthub.auth.config.custom.CustomUserDetails;
 import org.ln678090.connecthub.auth.config.keys.RsaKeyProperties;
 import org.ln678090.connecthub.auth.config.ratelimit.RateLimitingFilter;
+
+import org.ln678090.connecthub.auth.exception.CustomAccessDeniedHandlerOauth2;
+import org.ln678090.connecthub.auth.exception.CustomAuthenticationEntryPointOauth2;
 import org.ln678090.connecthub.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,20 +42,24 @@ public class SecurityConfig {
     private final RsaKeyProperties rsaKeys;
     @Value("${app.cors.allowed-origins}")
     private List<String> allowedOrigins;
-       @Bean
-   public SecurityFilterChain securityFilterChain(HttpSecurity  http) throws Exception {
-        return  http.
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationEntryPointOauth2 entryPointOauth2, CustomAccessDeniedHandlerOauth2 accessDeniedHandlerOauth2) throws Exception {
+        return http.
                 csrf(AbstractHttpConfigurer::disable)
-                .cors(cors->cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth->auth
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/test").permitAll()
-                       .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2->oauth2
-                        .jwt(Customizer.withDefaults()))
-                .sessionManagement(session->session
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(Customizer.withDefaults())
+                        .authenticationEntryPoint(entryPointOauth2)
+                        .accessDeniedHandler(accessDeniedHandlerOauth2)
+                )
+                .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
@@ -61,18 +68,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-Requested-With"));
-
         configuration.setAllowCredentials(Boolean.TRUE);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
@@ -88,8 +92,9 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return  Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+        return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
+
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();

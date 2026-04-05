@@ -36,6 +36,7 @@ public class FriendRequest {
 
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private FriendRequestStatus  status;
 

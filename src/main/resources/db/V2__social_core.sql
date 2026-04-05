@@ -61,8 +61,38 @@ CREATE TABLE comments (
                           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                           updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE follows (
+                         id UUID PRIMARY KEY ,
+                         follower_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                         following_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                         UNIQUE(follower_id, following_id) -- Chống theo dõi trùng lặp
+);
+
+CREATE TABLE notifications (
+                               id UUID PRIMARY KEY ,
+                               recipient_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- Người nhận thông báo
+                               actor_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,     -- Người cuối cùng tạo hành động
+                               type VARCHAR(50) NOT NULL,                                         -- LIKE_POST, COMMENT_POST, FOLLOW, ACCEPT_FRIEND...
+                               reference_id varchar,                                                 -- ID của bài viết hoặc người dùng liên quan (để click vào chuyển trang)
+                               actor_count INTEGER NOT NULL DEFAULT 1,                            -- Số lượng người gộp (Ví dụ: A và 5 người khác)
+                               is_read BOOLEAN NOT NULL DEFAULT FALSE,                            -- Đã đọc chưa?
+                               created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                               updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()                      -- Dùng updated_at làm con trỏ (cursor) vì khi gộp sẽ update thời gian
+);
+
+-- Index cực kỳ quan trọng để query phân trang cực nhanh theo updated_at
+CREATE INDEX idx_notifications_recipient_updated ON notifications(recipient_id, updated_at DESC);
+-- Index để tìm nhanh xem có thông báo trùng loại/reference để gộp không
+CREATE INDEX idx_notifications_aggregation ON notifications(recipient_id, type, reference_id) WHERE is_read = false;
+
+CREATE INDEX idx_follows_following ON follows(following_id);
+CREATE INDEX idx_follows_follower ON follows(follower_id);
+
 
 CREATE INDEX idx_comments_post_id ON comments(post_id);
 CREATE INDEX idx_comments_parent_id ON comments(parent_id);
 CREATE INDEX idx_posts_created_id_desc
     ON posts (created_at DESC, id DESC);
+
+CREATE INDEX idx_friendships_user_created ON friendships(user_id, created_at DESC);

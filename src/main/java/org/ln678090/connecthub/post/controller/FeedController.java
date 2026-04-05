@@ -1,7 +1,7 @@
 package org.ln678090.connecthub.post.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.ln678090.connecthub.auth.dto.resp.ApiResp;
+import org.ln678090.connecthub.common.dto.resp.ApiResp;
 import org.ln678090.connecthub.auth.utils.SecurityUtils;
 import org.ln678090.connecthub.post.service.PostService;
 import org.springframework.data.domain.ScrollPosition;

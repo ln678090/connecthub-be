@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.ln678090.connecthub.auth.dto.privateDto.TokenPair;
 import org.ln678090.connecthub.auth.dto.req.LoginRequest;
 import org.ln678090.connecthub.auth.dto.req.RegisterRequest;
-import org.ln678090.connecthub.auth.dto.resp.ApiResp;
+import org.ln678090.connecthub.common.dto.resp.ApiResp;
 import org.ln678090.connecthub.auth.dto.resp.AuthResponse;
 import org.ln678090.connecthub.auth.service.AuthService;
 import org.springframework.http.HttpHeaders;
@@ -110,14 +110,14 @@ public class AuthController {
     @GetMapping("/test")
     public ResponseEntity<ApiResp<String>> test() {
 
-        String threadName = Thread.currentThread().getName();
+//        String threadName = Thread.currentThread().getName();
 
         // Log ra console để bạn quan sát trực tiếp trên Render Log
-        System.out.println("===> Request đang được xử lý bởi Thread: " + threadName);
+//        System.out.println("===> Request đang được xử lý bởi Thread: " + threadName);
 
         return ResponseEntity.ok(ApiResp.<String>builder()
-                .timestamp(Instant.now().toString())
-                .data("Current Thread: " + threadName)
+//                .timestamp(Instant.now().toString())
+//                .data("Current Thread: " + threadName)
                 .build());
     }
 

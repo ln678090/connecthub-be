@@ -44,7 +44,7 @@ src/main/resources/db/private/
 .env.local
 .env.development
 .env.*
-
+java_all_code.txt
 # Bỏ qua file nhật ký (logs) có thể chứa thông tin người dùng
 *.log
 logs/

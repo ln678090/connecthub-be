@@ -2,7 +2,9 @@ package org.ln678090.connecthub.friend.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -10,10 +12,13 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.ln678090.connecthub.auth.entity.User;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "friendships")
 public class Friendship {
     @EmbeddedId
@@ -35,6 +40,8 @@ public class Friendship {
     @ColumnDefault("now()")
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
+
+
 
     @PrePersist
     final void prePersist() {

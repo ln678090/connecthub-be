@@ -1,7 +1,7 @@
 package org.ln678090.connecthub.auth.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ln678090.connecthub.auth.dto.resp.ApiResp;
+import org.ln678090.connecthub.common.dto.resp.ApiResp;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

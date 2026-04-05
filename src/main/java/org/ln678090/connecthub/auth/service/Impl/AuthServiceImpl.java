@@ -53,18 +53,15 @@ public class AuthServiceImpl implements AuthService {
         }
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Role mặc định không tồn tại "));
-        User newUser = new User(
-                null,
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                request.fullName(),
-                null,
-                true,
-                OffsetDateTime.now(),
-                OffsetDateTime.now(),
-                Set.of(userRole)
-        );
-
+        User newUser =  User.builder()
+                .email(request.email())
+                .passwordHash(passwordEncoder.encode(request.password()))
+                .fullName(request.fullName())
+                .isEnabled(Boolean.TRUE)
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .roles(Set.of(userRole))
+                .build();
         userRepository.save(newUser);
         CustomUserDetails userDetails = CustomUserDetails.fromUser(newUser);
         return new TokenPair(
@@ -90,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(String refreshToken) {
-        if (refreshToken == null || refreshToken.isEmpty())  return;
+        if (refreshToken == null || refreshToken.isEmpty()) return;
         tokenService.deleteRefreshToken(refreshToken);
     }
 

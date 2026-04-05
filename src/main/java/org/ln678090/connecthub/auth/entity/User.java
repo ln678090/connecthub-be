@@ -2,10 +2,8 @@ package org.ln678090.connecthub.auth.entity;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.OffsetDateTime;
@@ -18,22 +16,22 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "users")
-public class User  {
+public class User {
     @Id
-    @Column(name = "id")
+    @Column
     private UUID id;
 
 
-
     @PrePersist
-    void generateId() {
+    final void generateId() {
         if (id == null) {
             id = UuidCreator.getTimeOrderedEpoch();
         }
     }
 
-    @Column(name = "email", nullable = false)
+    @Column(nullable = false)
     private String email;
 
     @Column(name = "password_hash", nullable = false)
@@ -41,13 +39,14 @@ public class User  {
 
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
-
+    @Builder.Default
     @Column(name = "avatar_url", length = 500)
-    private String avatarUrl;
+    private String avatarUrl = "https://res.cloudinary.com/dayoanitt/image/upload/v1774417116/davbhywnemftongrmdwx.jpg";
 
     @ColumnDefault("true")
     @Column(name = "is_enabled")
-    private Boolean isEnabled;
+    @Builder.Default
+    private Boolean isEnabled = Boolean.TRUE;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")
@@ -64,7 +63,19 @@ public class User  {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Khóa ngoại trỏ đến bảng Roles
     )
     private Set<Role> roles = new LinkedHashSet<>();
-
+    @Size(max = 255)
+    @Builder.Default
+    @ColumnDefault("https://res.cloudinary.com/dayoanitt/image/upload/v1774417246/ydts7bqldo4rdl4izki8.jpg")
+    @Column(name = "cover_url")
+    private String coverUrl = "https://res.cloudinary.com/dayoanitt/image/upload/v1774417246/ydts7bqldo4rdl4izki8.jpg";
+    @Column(length = Integer.MAX_VALUE)
+    private String bio;
+    @Size(max = 100)
+    @Column(length = 100)
+    private String location;
+    @Size(max = 255)
+    @Column(name = "website_url")
+    private String websiteUrl;
 
 
 }
