@@ -34,7 +34,7 @@ public class UserController {
 //
 //   return ResponseEntity.ok(ApiResp.builder().message("success").data(resp).build());
 //    }
-    // UserController.java
+    // UserControllerToChat.java
     @GetMapping("/profile/{id}")
     public ResponseEntity<?> getProfile(@PathVariable String id, Authentication authentication) {
 

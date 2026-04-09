@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -78,5 +79,15 @@ public class FriendController {
 
         Map<String, Object> response = friendService.getFriendsList(currentUserId, cursorTime, limit);
         return ResponseEntity.ok(ApiResp.builder().message("Thành công").data(response).build());
+    }
+    @GetMapping("/api/friends/status/{userA}/{userB}")
+    public ResponseEntity<Map<String, String>> getFriendshipStatus(@PathVariable UUID userA, @PathVariable UUID userB) {
+        String status = friendService.getUiStatus(userA, userB);
+
+
+        Map<String, String> response = new HashMap<>();
+        response.put("status", status);
+
+        return ResponseEntity.ok(response);
     }
 }

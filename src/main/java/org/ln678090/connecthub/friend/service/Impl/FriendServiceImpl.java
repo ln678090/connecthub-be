@@ -21,6 +21,7 @@ import java.awt.print.Pageable;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -214,4 +215,36 @@ public void unfollowUser(UUID currentUserId, UUID targetUserId) {
     // Spring Data JPA dùng @Modifying @Query nên cần được bọc trong @Transactional
     followRepository.deleteByFollowerIdAndFollowingId(currentUserId, targetUserId);
 }
+
+    @Override
+    public String getUiStatus(UUID currentUserId, UUID targetUserId) {
+        if (currentUserId.equals(targetUserId)) {
+            return "SELF";
+        }
+
+        // 1. Kiểm tra xem đã là bạn bè chưa (Bảng friendships)
+        boolean isFriend = friendshipRepository.isFriend(currentUserId, targetUserId);
+        if (isFriend) {
+            return "FRIEND";
+        }
+
+        // 2. Nếu chưa là bạn, kiểm tra xem có lời mời nào đang chờ không (Bảng friend_requests)
+        Optional<FriendRequest> pendingReq = friendRequestRepository.findPendingRequestBetween(currentUserId, targetUserId);
+
+        if (pendingReq.isPresent()) {
+            FriendRequest req = pendingReq.get();
+            // Nếu mình là người gửi (sender) -> Đang chờ họ đồng ý
+            if (req.getSender().getId().equals(currentUserId)) {
+                return "PENDING_OUT";
+            }
+            // Nếu họ là người gửi (receiver là mình) -> Đang chờ mình đồng ý
+            else {
+                return "PENDING_IN";
+            }
+        }
+
+        // 3. Không là bạn, cũng không có lời mời nào -> Người lạ
+        return "NONE";
+    }
+
 }

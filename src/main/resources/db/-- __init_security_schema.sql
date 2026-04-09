@@ -17,6 +17,24 @@ CREATE TABLE users (
                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE users
+    ALTER COLUMN avatar_url
+        SET DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417116/davbhywnemftongrmdwx.jpg';
+
+ALTER TABLE users
+    ADD COLUMN cover_url varchar(255)
+        DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417246/ydts7bqldo4rdl4izki8.jpg';
+
+ALTER TABLE users
+    ADD COLUMN bio text;
+
+ALTER TABLE users
+    ADD COLUMN location varchar(100);
+
+ALTER TABLE users
+    ADD COLUMN website_url varchar(255);
+ALTER TABLE users
+    ADD COLUMN username varchar(255);
 
 -- Bảng trung gian User - Role (Nhiều-Nhiều)
 CREATE TABLE user_roles (

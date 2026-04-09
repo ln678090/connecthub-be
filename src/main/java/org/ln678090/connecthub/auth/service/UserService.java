@@ -3,7 +3,9 @@ package org.ln678090.connecthub.auth.service;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.ln678090.connecthub.auth.dto.resp.UserProfileResp;
+import org.ln678090.connecthub.chat.dto.UserFindUserResp;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -17,4 +19,6 @@ public interface UserService {
     UserProfileResp getProfile(UUID currentUserId, String targetIdStr);
 
     void updateProfileDetails(UUID currentUserId, @NotBlank(message = "Họ tên không được để trống") @Size(max = 100, message = "Họ tên không được vượt quá 100 ký tự") String s, @Size(max = 255, message = "Tiểu sử không được vượt quá 255 ký tự") String bio, @Size(max = 100, message = "Vị trí không được vượt quá 100 ký tự") String location, @Size(max = 500, message = "URL trang web không được vượt quá 500 ký tự") String s1);
+
+    List<UserFindUserResp> searchUsers(String query, UUID currentUserId);
 }

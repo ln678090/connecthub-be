@@ -85,3 +85,6 @@ cloudinary:
   cloud-name: ${CLOUNDINARY_CLOUD_NAME}
   api-key: ${CLOUNDINARY_API_KEY}
   api-secret: ${CLOUNDINARY_API_SECRET}
+
+appbe:
+  chatrealtimeurl: ${CHAT_REALTIME_URL}

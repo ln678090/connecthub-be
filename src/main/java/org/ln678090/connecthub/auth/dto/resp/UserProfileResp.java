@@ -10,6 +10,7 @@ public record UserProfileResp(
         String friendshipStatus, // "NONE", "FRIENDS", "REQUEST_SENT", "REQUEST_RECEIVED", "SELF"
         long followerCount,
         long followingCount,
-        boolean isFollowing  //  mình có đang theo dõi họ không
+        boolean isFollowing , //  mình có đang theo dõi họ không
+        boolean isOnline
 ) {
 }

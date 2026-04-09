@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, FriendshipId> {
@@ -25,4 +26,8 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Friendsh
             "FROM Friendship f WHERE f.user.id = :userId AND f.createdAt < :cursor ORDER BY f.createdAt DESC")
     List<FriendItemResp> findFriendsWithCursor(@Param("userId") UUID userId, @Param("cursor") OffsetDateTime cursor, Pageable pageable);
 
+    @Query("SELECT f FROM Friendship f WHERE (f.user.id = :user1 AND f.friend.id = :user2) OR (f.user.id = :user2 AND f.friend.id = :user1)")
+    Optional<Friendship> findFriendshipBetween(@Param("user1") UUID user1, @Param("user2") UUID user2);
+    @Query("SELECT COUNT(f) > 0 FROM Friendship f WHERE (f.user.id = :user1 AND f.friend.id = :user2) OR (f.user.id = :user2 AND f.friend.id = :user1)")
+    boolean isFriend(@Param("user1") UUID user1, @Param("user2") UUID user2);
 }

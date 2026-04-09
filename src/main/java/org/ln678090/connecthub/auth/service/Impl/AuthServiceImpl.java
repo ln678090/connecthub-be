@@ -11,6 +11,8 @@ import org.ln678090.connecthub.auth.entity.User;
 import org.ln678090.connecthub.auth.repository.RoleRepository;
 import org.ln678090.connecthub.auth.repository.UserRepository;
 import org.ln678090.connecthub.auth.service.AuthService;
+import org.ln678090.connecthub.chat.dto.SyncUserDto;
+import org.ln678090.connecthub.chat.service.ChatRealtimeService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ChatRealtimeService chatRealtimeService;
 
     @Override
     public TokenPair login(LoginRequest request) {
@@ -63,6 +66,10 @@ public class AuthServiceImpl implements AuthService {
                 .roles(Set.of(userRole))
                 .build();
         userRepository.save(newUser);
+
+        SyncUserDto syncUserDto=new SyncUserDto(newUser);
+        chatRealtimeService.syncUserToChatService(syncUserDto);
+
         CustomUserDetails userDetails = CustomUserDetails.fromUser(newUser);
         return new TokenPair(
                 tokenService.generateAccessToken(userDetails.id(), userDetails.getRolesAsString()),

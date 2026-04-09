@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-04-05T12:13:57+0700",
+    date = "2026-04-09T20:30:25+0700",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25.0.1 (Oracle Corporation)"
 )
 @Component
@@ -37,8 +37,9 @@ public class UserMapperImpl implements UserMapper {
         long followerCount = 0L;
         long followingCount = 0L;
         boolean isFollowing = false;
+        boolean isOnline = false;
 
-        UserProfileResp userProfileResp = new UserProfileResp( fullName, bio, location, websiteUrl, avatarUrl, coverUrl, friendshipStatus, followerCount, followingCount, isFollowing );
+        UserProfileResp userProfileResp = new UserProfileResp( fullName, bio, location, websiteUrl, avatarUrl, coverUrl, friendshipStatus, followerCount, followingCount, isFollowing, isOnline );
 
         return userProfileResp;
     }

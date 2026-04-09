@@ -6,6 +6,7 @@ import org.ln678090.connecthub.auth.entity.User;
 import org.ln678090.connecthub.auth.mapper.UserMapper;
 import org.ln678090.connecthub.auth.repository.UserRepository;
 import org.ln678090.connecthub.auth.service.UserService;
+import org.ln678090.connecthub.chat.dto.UserFindUserResp;
 import org.ln678090.connecthub.friend.entity.FriendRequestStatus;
 import org.ln678090.connecthub.friend.entity.FriendshipId;
 import org.ln678090.connecthub.friend.repository.FollowRepository;
@@ -14,7 +15,9 @@ import org.ln678090.connecthub.friend.repository.FriendshipRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,12 +72,12 @@ public class UserServiceImpl implements UserService {
         long followerCount = followRepository.countByFollowingId(targetUserId);
         long followingCount = followRepository.countByFollowerId(targetUserId);
         boolean isFollowing = currentUserId != null && followRepository.existsByFollowerIdAndFollowingId(currentUserId, targetUserId);
-
+boolean isOnline=false;
 
         return new UserProfileResp(
                 targetUser.getFullName(), targetUser.getBio(), targetUser.getLocation(),
                 targetUser.getWebsiteUrl(), targetUser.getAvatarUrl(), targetUser.getCoverUrl(), status,
-                followerCount, followingCount, isFollowing
+                followerCount, followingCount, isFollowing,isOnline
         );
     }
     @Override
@@ -89,5 +92,22 @@ public class UserServiceImpl implements UserService {
         user.setWebsiteUrl(websiteUrl != null ? websiteUrl.trim() : null);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public List<UserFindUserResp> searchUsers(String query, UUID currentUserId) {
+        // Gọi query trong DB
+        List<User> users = userRepository.searchUsers(query, currentUserId);
+
+        // Chuyển đổi Entity sang DTO
+        return users.stream()
+                .map(u -> new UserFindUserResp(
+                        u.getId(),
+                        u.getFullName(),
+                        u.getUsername(),
+                        u.getAvatarUrl(), // Cẩn thận tên trường (bên ConnectHub thường là avatarUrl)
+                        Boolean.TRUE.equals(true)
+                ))
+                .collect(Collectors.toList());
     }
 }

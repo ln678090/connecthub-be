@@ -76,6 +76,9 @@ public class User {
     @Size(max = 255)
     @Column(name = "website_url")
     private String websiteUrl;
+    @Size(max = 255)
+    @Column(name = "username")
+    private String username;
 
 
 }

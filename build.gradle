@@ -63,6 +63,10 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:3.27.2'
     implementation 'javax.cache:cache-api:1.1.1'
     testImplementation 'com.h2database:h2'
+    implementation 'com.password4j:password4j:1.8.4'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+//    implementation platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.1")
+//    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
 //spotbugs {
 //    toolVersion = '4.9.8'

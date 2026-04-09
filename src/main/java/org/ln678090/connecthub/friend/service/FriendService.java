@@ -17,4 +17,6 @@ public interface FriendService {
     Map<String, Object> getFriendsList(UUID userId, OffsetDateTime cursor, int limit);
     void followUser(UUID currentUserId, UUID targetUserId);
     void unfollowUser(UUID currentUserId, UUID targetUserId);
+
+    String getUiStatus(UUID userA, UUID userB);
 }
