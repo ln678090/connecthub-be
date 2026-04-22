@@ -147,6 +147,23 @@ public class CommentServiceImpl implements CommentService
         Comment comment=commentRepository.findById(commentId)   .orElseThrow(() -> new IllegalArgumentException("Bình luận không tồn tại"));
         return mapToResponse(comment);
     }
+    @Transactional
+    @Override
+    public CommentResponse updateComment(UUID commentId, UUID currentUserId, CommentRequest request) throws AccessDeniedException {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Bình luận không tồn tại"));
+
+        // Kiểm tra quyền (chỉ người tạo mới được sửa)
+        if (!comment.getUser().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("Bạn không có quyền sửa bình luận này");
+        }
+
+        // Cập nhật nội dung
+        comment.setContent(request.content());
+        comment = commentRepository.save(comment);
+
+        return mapToResponse(comment);
+    }
     private CommentResponse mapToResponse(Comment comment) {
         return new CommentResponse(
                 comment.getId(),

@@ -35,7 +35,19 @@ public class TokenService {
                 .build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
+    public String generateInternalToken(UUID userId) {
+        Instant now = Instant.now();
 
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("connecthub-internal")
+                .issuedAt(now)
+                .expiresAt(now.plus(5, ChronoUnit.MINUTES)) // ngắn thôi cho an toàn
+                .subject(userId.toString())
+                .claim("scope", "internal")
+                .build();
+
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
     public String generateAccessTokenFromAuth(Authentication authentication, UUID userId) {
         String roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

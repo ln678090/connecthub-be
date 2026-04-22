@@ -25,4 +25,6 @@ public interface CommentService {
     void softDeleteComment(UUID commentId, UUID currentUserId) throws AccessDeniedException;
 
     CommentResponse getCommentById(UUID commentId);
+    @Transactional
+    CommentResponse updateComment(UUID commentId, UUID currentUserId, CommentRequest request) throws AccessDeniedException;
 }

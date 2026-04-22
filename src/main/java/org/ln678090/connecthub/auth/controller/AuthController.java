@@ -3,6 +3,7 @@ package org.ln678090.connecthub.auth.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.ln678090.connecthub.auth.dto.privateDto.TokenPair;
+import org.ln678090.connecthub.auth.dto.req.GoogleLoginRequest;
 import org.ln678090.connecthub.auth.dto.req.LoginRequest;
 import org.ln678090.connecthub.auth.dto.req.RegisterRequest;
 import org.ln678090.connecthub.common.dto.resp.ApiResp;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -120,7 +122,28 @@ public class AuthController {
 //                .data("Current Thread: " + threadName)
                 .build());
     }
+    @PostMapping("/login/google")
+    public ResponseEntity<ApiResp<AuthResponse>> loginWithGoogle(@Valid @RequestBody GoogleLoginRequest request) {
+        try {
+            // isMobile = false (Gắn Cookie giống bản Login web thông thường)
+            // Nếu bạn làm Mobile thì có thể truyền cờ tùy chỉnh hoặc làm thêm API riêng
+            TokenPair tokens = authService.loginWithGoogle(request.idToken());
+            return buildAuthResponse(tokens, HttpStatus.OK, "Đăng nhập Google thành công", false);
 
+        } catch (DisabledException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResp.<AuthResponse>builder()
+                            .message("Tài khoản của bạn bị khóa. Vui lòng liên hệ Admin.")
+                            .timestamp(Instant.now().toString())
+                            .build());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResp.<AuthResponse>builder()
+                            .message("Xác thực Google thất bại.")
+                            .timestamp(Instant.now().toString())
+                            .build());
+        }
+    }
     /**
      * Hàm tiện ích DUY NHẤT để gom chung logic tạo Cookie và bọc ApiResp
      */

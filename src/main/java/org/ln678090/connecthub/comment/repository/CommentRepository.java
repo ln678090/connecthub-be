@@ -24,4 +24,6 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     // 2. Lấy phản hồi (Cursor tăng dần - cũ nhất xếp trên cho dễ đọc theo luồng)
     List<Comment> findByParentIdAndCreatedAtGreaterThanOrderByCreatedAtAsc(
             UUID parentId, OffsetDateTime cursor, Pageable pageable);
+
+    long countByPostId(UUID id);
 }

@@ -46,7 +46,7 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk18on:1.83")
 
     implementation 'org.mapstruct:mapstruct:1.6.3'
-
+    implementation 'com.google.api-client:google-api-client:2.2.0'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 //    implementation("com.cloudinary:cloudinary-core:2.3.2")
     implementation("com.cloudinary:cloudinary-http44:1.39.0")

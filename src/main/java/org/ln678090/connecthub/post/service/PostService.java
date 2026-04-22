@@ -1,6 +1,7 @@
 package org.ln678090.connecthub.post.service;
 
 import org.ln678090.connecthub.post.dto.req.CreatePostRequest;
+import org.ln678090.connecthub.post.dto.req.UpdatePostRequest;
 import org.ln678090.connecthub.post.dto.resp.PostResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.ScrollPosition;
@@ -21,4 +22,5 @@ public interface PostService {
     Map<String, Object> getFeedCursor(UUID currentUserId, ScrollPosition scrollPosition, int size);
     Map<String, Object> getPostsByUserIdCursor(UUID targetUserId, UUID currentUserId, ScrollPosition scrollPosition, int size);
     PostResponse getPostById(UUID postId, UUID currentUserId);
+    PostResponse updatePost(UUID postId, UUID currentUserId, UpdatePostRequest request) throws AccessDeniedException;
 }

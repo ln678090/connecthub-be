@@ -13,6 +13,7 @@ public interface AuthService {
 
     @Transactional
     TokenPair refreshToken(String oldRefreshToken);
-
+    // Trong file AuthService.java
+    TokenPair loginWithGoogle(String idTokenString);
     void logout(String refreshToken);
 }

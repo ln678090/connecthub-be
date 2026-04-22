@@ -3,9 +3,11 @@ package org.ln678090.connecthub.post.service.Impl;
 import lombok.RequiredArgsConstructor;
 import org.ln678090.connecthub.auth.entity.User;
 import org.ln678090.connecthub.auth.repository.UserRepository;
+import org.ln678090.connecthub.comment.repository.CommentRepository;
 import org.ln678090.connecthub.notification.entity.TypeNotification;
 import org.ln678090.connecthub.notification.service.NotificationService;
 import org.ln678090.connecthub.post.dto.req.CreatePostRequest;
+import org.ln678090.connecthub.post.dto.req.UpdatePostRequest;
 import org.ln678090.connecthub.post.dto.resp.PostResponse;
 import org.ln678090.connecthub.post.entity.Post;
 import org.ln678090.connecthub.post.entity.PostLike;
@@ -30,6 +32,7 @@ public class PostServiceImpl implements PostService
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
     private final NotificationService notificationService;
+    private final CommentRepository commentRepository;
 
     @Override
     @Transactional
@@ -213,8 +216,26 @@ public class PostServiceImpl implements PostService
 
         return toResponse(post, likedByMe, likeCount);
     }
+    @Override
+    @Transactional
+    public PostResponse updatePost(UUID postId, UUID currentUserId, UpdatePostRequest request) throws AccessDeniedException {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bài viết không tồn tại"));
 
+        if (!post.getUser().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("Bạn không có quyền sửa bài viết này");
+        }
+
+        post.setContent(request.content().trim());
+        post.setImageUrl(request.imageUrl());
+        postRepository.save(post);
+
+        long likeCount = postLikeRepository.countByPost_Id(postId);
+        boolean likedByMe = postLikeRepository.existsById(new PostLikeId(postId, currentUserId));
+        return toResponse(post, likedByMe, likeCount);
+    }
     private PostResponse toResponse(Post post, boolean likedByMe, long likeCount) {
+        long commentCount = commentRepository.countByPostId(post.getId());
         return new PostResponse(
                 post.getId(),
                 post.getUser().getId(),
@@ -224,7 +245,7 @@ public class PostServiceImpl implements PostService
                 post.getImageUrl(),
                 post.getCreatedAt(),
                 likeCount,
-                0L,
+                commentCount,
                 likedByMe
         );
     }

@@ -8,9 +8,6 @@ import org.ln678090.connecthub.auth.utils.SecurityUtils;
 import org.ln678090.connecthub.comment.dto.req.CommentRequest;
 import org.ln678090.connecthub.comment.dto.resp.CommentResponse;
 import org.ln678090.connecthub.comment.service.Impl.CommentServiceImpl;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +36,18 @@ public class CommentController {
                 .timestamp(Instant.now().toString())
                 .build();
     }
-
+    @PutMapping("/comments/{commentId}")
+    public ApiResp<CommentResponse> updateComment(
+            @PathVariable UUID commentId,
+            @Valid @RequestBody CommentRequest request,
+            Authentication authentication) throws AccessDeniedException {
+        UUID userId = SecurityUtils.currentUserId(authentication);
+        return ApiResp.<CommentResponse>builder()
+                .message("Cập nhật bình luận thành công")
+                .data(commentService.updateComment(commentId, userId, request))
+                .timestamp(Instant.now().toString())
+                .build();
+    }
     @GetMapping("/{postId}/comments")
     public ApiResp<Map<String, Object>> getComments(
             @PathVariable UUID postId,
@@ -85,15 +93,12 @@ public class CommentController {
                 .timestamp(Instant.now().toString())
                 .build();
     }
-    @GetMapping("/comments/" +
-            "{commentId}/detail")
-    public ResponseEntity<?> getCommentById(@PathVariable UUID commentId) {
-        // Giả sử CommentService của bạn có hàm getCommentById trả về CommentResponse y hệt lúc get list
+    @GetMapping("/comments/{commentId}/detail")
+    public ApiResp<Object> getCommentById(@PathVariable UUID commentId) {
         CommentResponse comment = commentService.getCommentById(commentId);
-
-        return ResponseEntity.ok(Map.of(
-                "message", "Lấy bình luận thành công",
-                "data", comment
-        ));
+        return ApiResp.builder()
+                .message("lấy bình luận thành công")
+                .data(comment)
+                .build();
     }
 }

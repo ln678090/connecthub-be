@@ -52,6 +52,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/test").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/dist/**",
+                                "/assets/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

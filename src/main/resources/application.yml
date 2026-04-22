@@ -44,3 +44,6 @@ server:
       max: 50
     # 3. Khi server bận, cho tối đa 100 request đứng xếp hàng (sau đó drop ngay lập tức)
     accept-count: 100
+app:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}

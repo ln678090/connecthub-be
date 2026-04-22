@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.ln678090.connecthub.common.dto.resp.ApiResp;
 import org.ln678090.connecthub.auth.utils.SecurityUtils;
 import org.ln678090.connecthub.post.dto.req.CreatePostRequest;
+import org.ln678090.connecthub.post.dto.req.UpdatePostRequest;
 import org.ln678090.connecthub.post.dto.resp.PostResponse;
 import org.ln678090.connecthub.post.service.PostService;
 import org.springframework.data.domain.ScrollPosition;
@@ -110,5 +111,16 @@ public class PostController {
                 .timestamp(Instant.now().toString())
                 .build();
     }
-
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> updatePost(
+            @PathVariable UUID postId,
+            @Valid @RequestBody UpdatePostRequest request,
+            Authentication authentication) throws AccessDeniedException {
+        UUID currentUserId = SecurityUtils.currentUserId(authentication);
+        PostResponse updated = postService.updatePost(postId, currentUserId, request);
+        return ResponseEntity.ok(ApiResp.builder()
+                .message("Cập nhật bài viết thành công")
+                .data(updated)
+                .build());
+    }
 }

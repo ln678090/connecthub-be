@@ -49,8 +49,8 @@ INSERT INTO roles (name) VALUES ('ROLE_USER'), ('ROLE_ADMIN');
 alter table users
 drop column avatar_url;
 
-ALTER TABLE users
     add COLUMN avatar_url VARCHAR(255) DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417116/davbhywnemftongrmdwx.jpg',
+ALTER TABLE users
     ADD COLUMN cover_url VARCHAR(255) DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417246/ydts7bqldo4rdl4izki8.jpg',
     ADD COLUMN bio TEXT,
     ADD COLUMN location VARCHAR(100),

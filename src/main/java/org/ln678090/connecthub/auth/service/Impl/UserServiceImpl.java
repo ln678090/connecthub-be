@@ -7,6 +7,7 @@ import org.ln678090.connecthub.auth.mapper.UserMapper;
 import org.ln678090.connecthub.auth.repository.UserRepository;
 import org.ln678090.connecthub.auth.service.UserService;
 import org.ln678090.connecthub.chat.dto.UserFindUserResp;
+import org.ln678090.connecthub.chat.service.ChatRealtimeService;
 import org.ln678090.connecthub.friend.entity.FriendRequestStatus;
 import org.ln678090.connecthub.friend.entity.FriendshipId;
 import org.ln678090.connecthub.friend.repository.FollowRepository;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final FriendshipRepository friendshipRepository;
     private final FriendRequestRepository friendRequestRepository;
     private final FollowRepository followRepository;
+    private final ChatRealtimeService chatRealtimeService;
 
     @Transactional
     @Override
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user"));
         user.setAvatarUrl(avatarUrl);
         userRepository.save(user);
+        chatRealtimeService.syncUpdateProfileToChatService(id, null, avatarUrl, null);
     }
     @Transactional
     @Override
@@ -92,6 +95,12 @@ boolean isOnline=false;
         user.setWebsiteUrl(websiteUrl != null ? websiteUrl.trim() : null);
 
         userRepository.save(user);
+        chatRealtimeService.syncUpdateProfileToChatService(
+                userId,
+                fullName,
+                user.getAvatarUrl(),
+                location
+        );
     }
 
     @Override
