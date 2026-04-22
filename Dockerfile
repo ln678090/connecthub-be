@@ -1,5 +1,5 @@
 # --- STAGE 1: MÔI TRƯỜNG BUILD ---
-FROM eclipse-temurin:25-jdk-alpine as builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 
 # Cache Gradle
@@ -15,7 +15,7 @@ COPY src src
 RUN ./gradlew build -x test --no-daemon
 
 # --- STAGE 2: MÔI TRƯỜNG CHẠY ---
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar

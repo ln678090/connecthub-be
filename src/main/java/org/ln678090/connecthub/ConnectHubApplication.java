@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan
 public class ConnectHubApplication {
 
-     static void main(String[] args) {
+   public   static void main(String[] args) {
         SpringApplication.run(ConnectHubApplication.class, args);
     }
 

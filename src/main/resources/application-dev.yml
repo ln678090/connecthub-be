@@ -19,8 +19,8 @@ spring:
       leak-detection-threshold: 60000
   data:
     redis:
-      #          url: ${REDIS_URL}
-#      username: ${REDIS_USERNAME}
+#      url: ${REDIS_URL}
+      username: ${REDIS_USERNAME}
       password: ${REDIS_PASSWORD}
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
@@ -39,8 +39,8 @@ management:
 #  public-key: classpath:keys/public.pem
 #  private-key: classpath:keys/private.pem
 rsa:
-  public-key: ${RSA_PUBLIC_KEY}
   private-key: ${RSA_PRIVATE_KEY}
+  public-key: ${RSA_PUBLIC_KEY}
 
 refresh-token:
   key: ${REFRESH_TOKEN_KEY_PREFIX}
