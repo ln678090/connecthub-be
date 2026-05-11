@@ -48,6 +48,7 @@ public class TokenService {
 
         return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
+
     public String generateAccessTokenFromAuth(Authentication authentication, UUID userId) {
         String roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

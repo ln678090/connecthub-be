@@ -1,7 +1,9 @@
 package org.ln678090.connecthub.friend.service.Impl;
 
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ln678090.connecthub.auth.entity.User;
 import org.ln678090.connecthub.auth.repository.UserRepository;
 import org.ln678090.connecthub.friend.dto.resp.FriendItemResp;
@@ -24,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FriendServiceImpl implements FriendService {
@@ -79,142 +82,205 @@ public class FriendServiceImpl implements FriendService {
     }
 
 
-@Override
-@Transactional(readOnly = true)
-public List<UserSuggestionResponse> getSuggestions(UUID currentUserId) {
-    return userRepository.findTop10ByIdNotOrderByCreatedAtDesc(currentUserId)
-            .stream()
-            .map(user -> new UserSuggestionResponse(
-                    user.getId(),
-                    user.getFullName(),
-                    user.getAvatarUrl(),
-                    0L
-            ))
-            .toList();
-}
-
-@Override
-@Transactional
-public void acceptRequest(UUID currentUserId, UUID senderId) {
-    FriendRequest request = friendRequestRepository.findBySender_IdAndReceiver_Id(senderId, currentUserId)
-            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lời mời"));
-
-    // 1. Cập nhật trạng thái
-    request.setStatus(FriendRequestStatus.ACCEPTED);
-    friendRequestRepository.save(request);
-
-    // 2. Truy vấn User từ Database
-    User currentUser = userRepository.findById(currentUserId)
-            .orElseThrow(() -> new IllegalArgumentException("Lỗi: Không tìm thấy current user"));
-    User senderUser = userRepository.findById(senderId)
-            .orElseThrow(() -> new IllegalArgumentException("Lỗi: Không tìm thấy sender user"));
-
-    // 3. Lưu bạn bè chiều đi (User -> Friend)
-    Friendship f1 = new Friendship();
-    f1.setId(new FriendshipId(currentUserId, senderId));
-    f1.setUser(currentUser);
-    f1.setFriend(senderUser);
-    friendshipRepository.save(f1);
-
-    // 4. Lưu bạn bè chiều ngược lại (Friend -> User)
-    Friendship f2 = new Friendship();
-    f2.setId(new FriendshipId(senderId, currentUserId));
-    f2.setUser(senderUser);
-    f2.setFriend(currentUser);
-    friendshipRepository.save(f2);
-
-    notificationService.sendNotification(
-            senderId, currentUserId, TypeNotification.ACCEPT_FRIEND, currentUserId.toString()
-    );
-
-}
-
-@Override
-@Transactional
-public void rejectRequest(UUID currentUserId, UUID senderId) {
-    // Xóa lời mời (hoặc bạn có thể set status = REJECTED tùy logic)
-    friendRequestRepository.deleteBySenderAndReceiver(senderId, currentUserId);
-}
-
-@Override
-@Transactional
-public void cancelRequest(UUID currentUserId, UUID receiverId) {
-    // Mình gửi nhưng đổi ý hủy
-    friendRequestRepository.deleteBySenderAndReceiver(currentUserId, receiverId);
-}
-
-@Override
-@Transactional
-public void unfriend(UUID currentUserId, UUID friendId) {
-    // Xóa trong bảng Friendship (cả 2 chiều)
-    friendshipRepository.deleteFriendship(currentUserId, friendId);
-    // Xóa cả record trong FriendRequest để reset trạng thái
-    friendRequestRepository.deleteConnection(currentUserId, friendId);
-}
-
-@Override
-public Map<String, Object> getFriendsList(UUID userId, OffsetDateTime cursor, int limit) {
-    // Nếu không truyền cursor (trang đầu tiên), lấy thời điểm hiện tại
-    if (cursor == null) {
-        cursor = OffsetDateTime.now();
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserSuggestionResponse> getSuggestions(UUID currentUserId) {
+        return userRepository.findTop10ByIdNotOrderByCreatedAtDesc(currentUserId)
+                .stream()
+                .map(user -> new UserSuggestionResponse(
+                        user.getId(),
+                        user.getFullName(),
+                        user.getAvatarUrl(),
+                        0L
+                ))
+                .toList();
     }
 
-    // Lấy limit + 1 để biết xem có còn dữ liệu cho trang tiếp theo hay không
-    List<FriendItemResp> friends = friendshipRepository.findFriendsWithCursor(
-            userId, cursor, PageRequest.of(0, limit + 1)
-    );
+    @Override
+    @Transactional
+    public void acceptRequest(UUID currentUserId, UUID senderId) {
+        FriendRequest request = friendRequestRepository.findBySender_IdAndReceiver_Id(senderId, currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lời mời"));
 
-    boolean hasNext = friends.size() > limit;
-    if (hasNext) {
-        friends.remove(limit); // Bỏ phần tử dư thừa (chỉ dùng để check)
-    }
+        // 1. Cập nhật trạng thái
+        request.setStatus(FriendRequestStatus.ACCEPTED);
+        friendRequestRepository.save(request);
 
-    String nextCursor = friends.isEmpty() ? null : friends.get(friends.size() - 1).connectedAt().toString();
+        // 2. Truy vấn User từ Database
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Lỗi: Không tìm thấy current user"));
+        User senderUser = userRepository.findById(senderId)
+                .orElseThrow(() -> new IllegalArgumentException("Lỗi: Không tìm thấy sender user"));
 
-    return Map.of(
-            "data", friends,
-            "nextCursor", nextCursor != null ? nextCursor : "",
-            "hasNext", hasNext
-    );
-}
+        // 3. Lưu bạn bè chiều đi (User -> Friend)
+        Friendship f1 = new Friendship();
+        f1.setId(new FriendshipId(currentUserId, senderId));
+        f1.setUser(currentUser);
+        f1.setFriend(senderUser);
+        friendshipRepository.save(f1);
 
-@Override
-@Transactional
-public void followUser(UUID currentUserId, UUID targetUserId) {
-    // Kiểm tra xem có tự follow chính mình không
-    if (currentUserId.equals(targetUserId)) {
-        throw new IllegalArgumentException("Không thể tự theo dõi chính mình");
-    }
-
-
-    User targetuser = userRepository.findById(targetUserId).orElseThrow(
-            () -> new IllegalArgumentException("Người dùng không tồn tại")
-    );
-    User currentUser = userRepository.findById(currentUserId).orElseThrow(
-            () -> new IllegalArgumentException("Người dùng không tồn tại")
-    );
-
-
-    // Kiểm tra xem đã follow chưa (tránh duplicate)
-    if (!followRepository.existsByFollowerIdAndFollowingId(currentUserId, targetUserId)) {
-        Follow follow = new Follow();
-
-        follow.setFollower(currentUser);
-        follow.setFollowing(targetuser);
-        followRepository.save(follow);
+        // 4. Lưu bạn bè chiều ngược lại (Friend -> User)
+        Friendship f2 = new Friendship();
+        f2.setId(new FriendshipId(senderId, currentUserId));
+        f2.setUser(senderUser);
+        f2.setFriend(currentUser);
+        friendshipRepository.save(f2);
 
         notificationService.sendNotification(
-                targetUserId, currentUserId, TypeNotification.FOLLOW, currentUserId.toString()
+                senderId, currentUserId, TypeNotification.ACCEPT_FRIEND, currentUserId.toString()
+        );
+
+    }
+
+    @Override
+    @Transactional
+    public void rejectRequest(UUID currentUserId, UUID senderId) {
+        // Xóa lời mời (hoặc bạn có thể set status = REJECTED tùy logic)
+        friendRequestRepository.deleteBySenderAndReceiver(senderId, currentUserId);
+    }
+
+    @Override
+    @Transactional
+    public void cancelRequest(UUID currentUserId, UUID receiverId) {
+        // Mình gửi nhưng đổi ý hủy
+        friendRequestRepository.deleteBySenderAndReceiver(currentUserId, receiverId);
+    }
+
+    @Override
+    @Transactional
+    public void unfriend(UUID currentUserId, UUID friendId) {
+        // Xóa trong bảng Friendship (cả 2 chiều)
+        friendshipRepository.deleteFriendship(currentUserId, friendId);
+        // Xóa cả record trong FriendRequest để reset trạng thái
+        friendRequestRepository.deleteConnection(currentUserId, friendId);
+    }
+
+    @Override
+    public Map<String, Object> getFriendsList(UUID userId, OffsetDateTime cursor, int limit) {
+        // Nếu không truyền cursor (trang đầu tiên), lấy thời điểm hiện tại
+        if (cursor == null) {
+            cursor = OffsetDateTime.now();
+        }
+
+        // Lấy limit + 1 để biết xem có còn dữ liệu cho trang tiếp theo hay không
+        List<FriendItemResp> friends = friendshipRepository.findFriendsWithCursor(
+                userId, cursor, PageRequest.of(0, limit + 1)
+        );
+
+        boolean hasNext = friends.size() > limit;
+        if (hasNext) {
+            friends.remove(limit); // Bỏ phần tử dư thừa (chỉ dùng để check)
+        }
+
+        String nextCursor = friends.isEmpty() ? null : friends.get(friends.size() - 1).connectedAt().toString();
+
+        return Map.of(
+                "data", friends,
+                "nextCursor", nextCursor != null ? nextCursor : "",
+                "hasNext", hasNext
         );
     }
-}
 
-@Override
-@Transactional
-public void unfollowUser(UUID currentUserId, UUID targetUserId) {
-    // Spring Data JPA dùng @Modifying @Query nên cần được bọc trong @Transactional
-    followRepository.deleteByFollowerIdAndFollowingId(currentUserId, targetUserId);
-}
+    @Override
+    @Transactional
+    public void followUser(UUID currentUserId, UUID targetUserId) {
+
+        if (currentUserId.equals(targetUserId)) {
+            throw new IllegalArgumentException("Không thể tự theo dõi chính mình");
+        }
+
+        //  //  User currentUser = userRepository.findById(currentUserId).orElseThrow(
+//            () -> new IllegalArgumentException("Người dùng không tồn tại")
+//    );
+//   //     User targetuser = userRepository.findById(targetUserId).orElseThrow(
+//                () -> new IllegalArgumentException("Người dùng không tồn tại")
+//        );
+        /* //////////
+        UUID followId = UuidCreator.getTimeOrderedEpoch();
+        OffsetDateTime createdAt = OffsetDateTime.now();
+        int rowsAffected = followRepository.insertFollowIfNotExists(
+                followId, currentUserId, targetUserId, createdAt
+        );
+        if (rowsAffected == 0) {
+            // Nếu không có dòng nào được insert, nghĩa là điều kiện WHERE bên trên bị sai
+            // (Hoặc User không tồn tại, hoặc đã follow rồi)
+            throw new IllegalArgumentException("Không thể follow Người dùng không tồn tại hoặc bạn đã follow trước đó");
+        }
+
+Hibernate:
+    insert
+    into
+        follows
+        (id, follower_id, following_id, created_at) select
+            ?,
+            ? ,
+            ?,
+            ?
+        where
+            exists (select
+                1
+            from
+                users
+            where
+                id =?)
+            and exists (select
+                1
+            from
+                users
+            where
+                id =?)
+            and not exists (  select
+                1
+            from
+                follows
+            WHERE
+                follower_id = ?
+                AND following_id = ?  )
+ */
+        /////////////
+        // dùng vỏ rỗng Proxy Object chứa đúng id thay vì query lấy cả user
+        //use a Proxy Object empty shell that contains the correct id instead of querying the entire user
+        /*
+        nó chạy
+        Hibernate:
+    insert
+    into
+        follows
+        (created_at, follower_id, following_id, id)
+    values
+        (?, ?, ?, ?)
+
+         */
+        User currentUser = userRepository.getReferenceById(currentUserId);
+        User targetuser = userRepository.getReferenceById(targetUserId);
+
+
+
+
+
+        try {
+//
+            Follow follow = new Follow();
+
+            follow.setFollower(currentUser);
+            follow.setFollowing(targetuser);
+            followRepository.save(follow);
+
+            notificationService.sendNotification(
+                    targetUserId, currentUserId, TypeNotification.FOLLOW, currentUserId.toString()
+            );
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Already Followed");
+        }
+//
+    }
+
+    @Override
+    @Transactional
+    public void unfollowUser(UUID currentUserId, UUID targetUserId) {
+        // Spring Data JPA dùng @Modifying @Query nên cần được bọc trong @Transactional
+        followRepository.deleteByFollowerIdAndFollowingId(currentUserId, targetUserId);
+    }
 
     @Override
     public String getUiStatus(UUID currentUserId, UUID targetUserId) {

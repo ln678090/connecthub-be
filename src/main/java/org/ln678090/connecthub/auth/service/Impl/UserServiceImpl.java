@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public void updateAvatar(UUID id, String avatarUrl) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user"));
         user.setAvatarUrl(avatarUrl);
-        userRepository.save(user);
+//        userRepository.save(user);
         chatRealtimeService.syncUpdateProfileToChatService(id, null, avatarUrl, null);
     }
     @Transactional
@@ -52,13 +52,15 @@ public class UserServiceImpl implements UserService {
         User user=userRepository.findById(UUID.fromString(id)).orElseThrow(()->new IllegalArgumentException("User not found"));
         return userMapper.toUserProfileResp(user);
     }
-
+@Transactional
     @Override
     public UserProfileResp getProfile(UUID currentUserId, String targetIdStr) {
         UUID targetUserId = UUID.fromString(targetIdStr);
         User targetUser = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
+        User targetUser1 = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+//targetUser.setAvatarUrl("sss");
         String status = "NONE";
 
         if (currentUserId != null) {

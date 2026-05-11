@@ -48,4 +48,5 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
     @EntityGraph(attributePaths = {"user"})
     Window<Post> findByUserIdOrderByCreatedAtDescIdDesc(UUID userId, ScrollPosition position, Limit limit);
 
+
 }

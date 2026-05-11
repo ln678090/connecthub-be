@@ -64,19 +64,51 @@ public class PostServiceImpl implements PostService
                 .map(Post::getId)
                 .collect(Collectors.toSet());
 
-        // Lấy danh sách các bài viết User hiện tại đã like
-        Set<UUID> likedPostIds = postIds.isEmpty() ? Set.of() :
+        if (postIds.isEmpty()) {
+            return Map.of("posts", List.of(), "nextCursor", "", "hasNext", false);
+        }
+
+        // Lấy bài đã like của user hiện tại
+        Set<UUID> likedPostIds = (currentUserId != null) ?
                 postLikeRepository.findByUser_IdAndPost_IdIn(currentUserId, postIds)
-                        .stream()
-                        .map(like -> like.getPost().getId())
-                        .collect(Collectors.toSet());
+                        .stream().map(like -> like.getPost().getId()).collect(Collectors.toSet())
+                : Collections.emptySet();
+
+        // Đếm Likes
+        Map<UUID, Long> likeCountsMap = postLikeRepository.countLikesByPostIds(postIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        obj -> (UUID) obj[0],
+                        obj -> (Long) obj[1]
+                ));
+        // Đếm Comments
+        Map<UUID, Long> commentCountsMap = commentRepository.countCommentsByPostIds(postIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        obj -> (UUID) obj[0],
+                        obj -> (Long) obj[1]
+                ));
+
 
         // Chuyển đổi từ Entity sang DTO
+//        List<PostResponse> dtos = postWindow.getContent().stream()
+//                .map(post -> toResponse(
+//                        post,
+//                        likedPostIds.contains(post.getId()),
+//                        postLikeRepository.countByPost_Id(post.getId())
+//                )).toList();
         List<PostResponse> dtos = postWindow.getContent().stream()
-                .map(post -> toResponse(
-                        post,
-                        likedPostIds.contains(post.getId()),
-                        postLikeRepository.countByPost_Id(post.getId())
+                .map(post -> new PostResponse(
+                        post.getId(),
+                        post.getUser().getId(),
+                        post.getUser().getFullName(),
+                        post.getUser().getAvatarUrl(),
+                        post.getContent(),
+                        post.getImageUrl(),
+                        post.getCreatedAt(),
+                        likeCountsMap.getOrDefault(post.getId(), 0L),       // Lookup từ RAM
+                        commentCountsMap.getOrDefault(post.getId(), 0L),    // Lookup từ RAM
+                        likedPostIds.contains(post.getId())
                 )).toList();
 
         // Xử lý con trỏ KeysetScrollPosition để trả về Map (chứa createdAt và id) cho Client dễ đọc

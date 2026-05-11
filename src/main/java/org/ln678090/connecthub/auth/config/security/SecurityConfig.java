@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/test").permitAll()
+                        .requestMatchers("/api/tracking/action").permitAll()
                         .requestMatchers(
                                 "/",
                                 "/index.html",

@@ -136,8 +136,13 @@ public class AuthServiceImpl implements AuthService {
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already exists ");
         }
+
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Role mặc định không tồn tại "));
+
+          Role userRole1 = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Role mặc định không tồn tại "));
+
         User newUser =  User.builder()
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))

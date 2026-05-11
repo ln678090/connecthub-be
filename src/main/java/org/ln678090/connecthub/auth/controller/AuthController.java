@@ -27,6 +27,12 @@ public class AuthController {
     private final AuthService authService;
     private static final int REFRESH_TOKEN_MAX_AGE = 2592000; //  ngày
 
+//    @PostMapping("/loginv1")
+//    public ResponseEntity<?> post(@RequestBody LoginRequest value) {
+//        TokenPair tokens = authService.login(value);
+//        return  ResponseEntity.ok(tokens);
+//    }
+
     @PostMapping("/login")
     public ResponseEntity<ApiResp<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         TokenPair tokens = authService.login(request);
@@ -155,7 +161,7 @@ public class AuthController {
                 .secure(true) // production nên để true khi dùng HTTPS
                 .path("/api/auth")
                 .maxAge(REFRESH_TOKEN_MAX_AGE)
-                .sameSite("None")
+                .sameSite("None") //Strict, Lax
                 .build();
 
         AuthResponse authResponse = new AuthResponse(
@@ -174,6 +180,7 @@ public class AuthController {
 
         if (!isMobile) {
             responseBuilder.header(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+//            responseBuilder.header(HttpHeaders.SET_COOKIE, String.format("refresh_token=%s",refreshCookie.toString()));
         }
 
         return responseBuilder.body(apiResp);

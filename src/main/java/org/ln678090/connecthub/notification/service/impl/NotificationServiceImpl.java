@@ -31,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     @Override
     public void sendNotification(UUID recipientId, UUID actorId, TypeNotification  type, String referenceId) {
-        // 1. Không gửi thông báo cho chính mình (VD: Tự like bài mình)
+        // 1. Không gửi thông báo cho chính mình
         if (recipientId.equals(actorId)) return;
 
         String postId = referenceId.contains("_") ? referenceId.split("_")[0] : referenceId;

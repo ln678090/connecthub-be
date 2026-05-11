@@ -4,9 +4,12 @@ import org.ln678090.connecthub.comment.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
@@ -26,4 +29,6 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
             UUID parentId, OffsetDateTime cursor, Pageable pageable);
 
     long countByPostId(UUID id);
+    @Query("SELECT c.post.id, COUNT(c) FROM Comment c WHERE c.post.id IN :postIds AND c.isDeleted = false GROUP BY c.post.id")
+    List<Object[]> countCommentsByPostIds(@Param("postIds") Set<UUID> postIds);
 }

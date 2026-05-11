@@ -45,16 +45,28 @@ CREATE TABLE user_roles (
 
 -- Insert roles mặc định
 INSERT INTO roles (name) VALUES ('ROLE_USER'), ('ROLE_ADMIN');
-
-alter table users
-drop column avatar_url;
-
-    add COLUMN avatar_url VARCHAR(255) DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417116/davbhywnemftongrmdwx.jpg',
-ALTER TABLE users
-    ADD COLUMN cover_url VARCHAR(255) DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417246/ydts7bqldo4rdl4izki8.jpg',
-    ADD COLUMN bio TEXT,
-    ADD COLUMN location VARCHAR(100),
-    ADD COLUMN website_url VARCHAR(255);
+--
+-- alter table users
+-- drop column avatar_url,
+--
+--     add COLUMN avatar_url VARCHAR(255) DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417116/davbhywnemftongrmdwx.jpg',
+-- ALTER TABLE users
+--     ADD COLUMN cover_url VARCHAR(255) DEFAULT 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417246/ydts7bqldo4rdl4izki8.jpg',
+--     ADD COLUMN bio TEXT,
+--     ADD COLUMN location VARCHAR(100),
+--     ADD COLUMN website_url VARCHAR(255);
 
 update users set avatar_url = 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417116/davbhywnemftongrmdwx.jpg' where avatar_url is null;
 update users set cover_url = 'https://res.cloudinary.com/dayoanitt/image/upload/v1774417246/ydts7bqldo4rdl4izki8.jpg' where cover_url is null;
+
+
+CREATE TABLE user_action (
+                             id UUID PRIMARY KEY,
+                             user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+                             action_type VARCHAR(100) NOT NULL,
+                             target VARCHAR(255),
+                             ip_address VARCHAR(50),
+                             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+create index  idx_user_actions_userid on user_action(user_id);
